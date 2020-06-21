@@ -12,8 +12,9 @@ function res = save_ms_waves(expname,ratname,datestr,trodenum,brody_dir)
 sz_to_load = 1e8;
 
 % path stuff + look for relevant ncs and mda files
-kjmtnsort_dir = fullfile(brody_dir,'kjmiller\Mountainsort');
+kjmtnsort_dir = fullfile(brody_dir,'kjmiller/Mountainsort');
 sorted_dir    = fullfile(kjmtnsort_dir,'sorted_data')
+local_sorted_dir    = fullfile('\\Mac\Home\projects\long_pbups\data\phys\','sorted_data');
 physdata_dir  = fullfile(brody_dir,'physdata',expname,ratname);
 ncs_dir       = dir(fullfile(physdata_dir,[datestr '*']));
 % if multiple directories come up for this date, assuming it's the last
@@ -25,6 +26,8 @@ addpath(fullfile(kjmtnsort_dir, '\Utilities\mdaio'))
 fn            = fullfile(sorted_dir,[ ratname '_' datestr ...
     '_TT' num2str(trodenum) '_sorted.mda']);
 res_fn            = fullfile(sorted_dir,[ ratname '_' datestr ...
+    '_TT' num2str(trodenum) '_mswaves.mat']);
+local_res_fn = fullfile(local_sorted_dir,[ ratname '_' datestr ...
     '_TT' num2str(trodenum) '_mswaves.mat']);
 
 dat           = readmda(fn);
@@ -95,4 +98,14 @@ for ll = 1:length(load_inds)-1
     end
 end
 
-save(res_fn, 'res','snip_before','snip_after')
+try
+    save(res_fn, 'res','snip_before','snip_after')
+catch
+    if ~exist(local_sorted_dir), mkdir(local_sorted_dir); end
+    local_rat_sorted_dir = fullfile(local_sorted_dir,ratname);
+    if ~exist(local_rat_sorted_dir) mkdir(local_rat_sorted_dir); end
+    local_rat_sess_sorted_dir = fullfile(local_rat_sorted_dir, datestr);
+    if ~exist(local_rat_sess_sorted_dir) mkdir(local_rat_sess_sorted_dir); end
+    save(local_res_fn, 'res', 'snip_before', 'snip_after')
+    warning('SAVING LOCALLY INSTEAD OF ON CLUSTER')
+end
