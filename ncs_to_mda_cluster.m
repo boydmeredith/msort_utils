@@ -1,7 +1,7 @@
 
 function ncs_to_mda_cluster(expname, ratname, sessiondate, tt)
-
-rat_fldr = ['/jukebox/brody/physdata/',expname,'/', ratname,'/'];
+physdata_dir = '/jukebox/brody/physdata/';
+rat_fldr = fullfile(physdata_dir,expname, ratname);
 results = dir([rat_fldr, sessiondate, '*']);
 
 if isempty(results)
@@ -17,7 +17,11 @@ addpath(genpath(fldr_scripts));
 
 % Nlx2MatCSC_v3 is the version for Linux
 fprintf(['Checking for data in: ', fldr_data,' \n', 'Loading data header... \n'])
-header = Nlx2MatCSC_v3([fldr_data,'TT', tt, '_1.ncs'],[0,0,0,0,0],1,1)
+hd = Nlx2MatCSC_v3([fldr_data,'TT', tt, '_1.ncs'],[0,0,0,0,0],1,1)
+
+temp = strfind(hd,'-SamplingFrequency') + length(srch_str);
+fs   = str2num(hd(temp-1+regexp(hd(temp:temp+10),'\d')));
+    us_per_sample = 1e6 / fs;
 
 %% Check everything is ok with the session timing
 fprintf('Checking timing\n')
