@@ -1,5 +1,7 @@
+function mda = ncs_to_mda_cluster(expname, ratname, sessiondate, tt, savedir)
+% function ncs_to_mda_cluster(expname, ratname, sessiondate, tt, savedir)
 
-function ncs_to_mda_cluster(expname, ratname, sessiondate, tt)
+% determine where to find the data
 physdata_dir = '/jukebox/brody/physdata/';
 rat_fldr = fullfile(physdata_dir,expname, ratname);
 results = dir([rat_fldr, sessiondate, '*']);
@@ -13,7 +15,7 @@ end
 fldr_data = [rat_fldr,results.name,'/'];
 fldr_scripts = '/jukebox/brody/kjmiller/Mountainsort/';
 addpath(genpath(fldr_scripts));
-    
+addpath('/usr/jtb3/code/msort_utils')
 
 % Nlx2MatCSC_v3 is the version for Linux
 fprintf(['Checking for data in: ', fldr_data,' \n', 'Loading data header... \n'])
@@ -70,8 +72,7 @@ clear samps4;
 
 % Write the mda
 fprintf('Writing MDA file\n')
-writemda64(mda,[fldr_scripts,'/tmp/tmp_', ratname, '_', sessiondate, '/', ratname, '_', sessiondate, '_TT', tt, '.mda'])
+writemda64(mda,fullfile(savedir,[ratname, '_', sessiondate, '_TT', tt, '.mda'])
 fprintf('MDA file written\n')
-clear mda
 
 end
